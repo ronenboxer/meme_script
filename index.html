@@ -90,7 +90,7 @@
 
         function onFileTypeSelect(event, value) {
             if (value === 'other' && elements.custom_file.classList.contains('hidden')) elements.custom_file.classList.remove('hidden');
-            if (!elements.custom_file.classList.contains('hidden')) elements.custom_file.classList.add('hidden');
+            if (value !== 'other' && !elements.custom_file.classList.contains('hidden')) elements.custom_file.classList.add('hidden');
             renderResult(event, value)
         }
 
@@ -104,7 +104,7 @@
                 if (key === 'file_types') elements.file_types.value = 'jpeg'
                 else elements[key].value = ''
             }
-            if (value !== 'other' && !elements.custom_file.classList.contains('hidden')) elements.custom_file.classList.add('hidden');
+            if (!elements.custom_file.classList.contains('hidden')) elements.custom_file.classList.add('hidden');
             _id = makeId()
             renderResult()
         }
