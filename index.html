@@ -96,7 +96,7 @@
 
         function onCopy() {
             if (validateInputs() !== true) return
-            navigator.clipboard.writeText(JSON.stringify(meme));
+            navigator.clipboard.writeText(JSON.stringify(meme) + ',');
         }
 
         function onClear() {
@@ -112,7 +112,7 @@
             meme = {
                 _id,
                 filename: _id + '.',
-                tags:{}
+                tags: {}
             }
             if (event?.target.id === 'file_types' && event?.target?.value === 'other') elements.custom_file.focus()
             const inputs = ['english_tags', 'hebrew_tags', 'file_types']
