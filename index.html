@@ -96,7 +96,7 @@
 
         function onCopy() {
             if (validateInputs() !== true) return
-            navigator.clipboard.writeText(JSON(meme));
+            navigator.clipboard.writeText(JSON.stringify(meme));
         }
 
         function onClear() {
