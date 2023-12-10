@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memes</title>
+    <style>
+        main {
+            padding: 20px;
+        }
+
+        form label {
+            display: block;
+        }
+
+        form label span {
+            margin-bottom: 8px;
+        }
+
+        form label>* {
+            display: block;
+        }
+
+        form label>*:not(span) {
+            margin-bottom: 20px;
+        }
+
+        #file_types,
+        #custom_file {
+            display: inline;
+        }
+
+        #custom_file.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <h1>Meme script</h1>
+
+        <form>
+            <label>
+                <span>Hebrew tags separated with comma ( , )</span>
+                <input type="text" id="hebrew_tags" placeholder="חמאס, חטופים, רקטות..." oninput="renderResult()">
+            </label>
+            <label>
+                <span>English tags separated with comma ( , )</span>
+                <input type="text" id="english_tags" placeholder="Hamas, Hostages, Missiles..."
+                    oninput="renderResult()">
+            </label>
+            <br>
+            <label>
+                <span>File type</span>
+                <select id="file_types" default="jpeg" oninput="onFileTypeSelect(event, value)">
+                    <option value="jpeg">jpeg</option>
+                    <option value="jpg">jpg</option>
+                    <option value="png">png</option>
+                    <option value="other">Other</option>
+                </select>
+                <input type="text" id="custom_file" class="hidden" oninput="renderResult()">
+            </label>
+        </form>
+        <div class="buttons">
+            <button id="copy_btn" onclick="onCopy()">Copy</button>
+            <button id="clear_btn" onclick="onClear()">Clear</button>
+        </div>
+        <pre id="preview"></pre>
+    </main>
+    <script>
+        let _id = makeId()
+        let meme = {}
+        const elements = {
+            hebrew_tags: null,
+            english_tags: null,
+            file_types: null,
+            custom_file: null,
+            copy_btn: null,
+            clear_btn: null,
+            preview: null,
+        }
+
+        window.addEventListener('load', () => {
+            Object.keys(elements).forEach(key => elements[key] = document.getElementById(key))
+            renderResult();
+        })
+
+        function onFileTypeSelect(event, value) {
+            if (value === 'other' && elements.custom_file.classList.contains('hidden')) elements.custom_file.classList.remove('hidden');
+            if (value !== 'other' && !elements.custom_file.classList.contains('hidden')) elements.custom_file.classList.add('hidden');
+            renderResult(event, value)
+        }
+
+        function onCopy() {
+            if (validateInputs() !== true) return
+            navigator.clipboard.writeText(JSON(meme));
+        }
+
+        function onClear() {
+            for (let key in elements) {
+                if (key === 'file_types') elements.file_types.value = 'jpeg'
+                else elements[key].value = ''
+            }
+            _id = makeId()
+            renderResult()
+        }
+
+        function renderResult(event, value) {
+            meme = {
+                _id,
+                filename: _id + '.',
+                tags:{}
+            }
+            if (event?.target.id === 'file_types' && event?.target?.value === 'other') elements.custom_file.focus()
+            const inputs = ['english_tags', 'hebrew_tags', 'file_types']
+            for (let key of inputs) {
+                if (key === 'file_types') meme.filename += (elements.file_types.value === 'other'
+                    ? elements.custom_file.value.trim()
+                    : elements.file_types.value)
+                if (key === 'file_types') continue
+                if (key === 'hebrew_tags' || key === 'english_tags') meme.tags[key.slice(0, 2).toUpperCase()] = elements[key].value.split(',').filter(v => v.trim()).map(v => v.trim()) || []
+                else meme[key] = elements[key].value.trim();
+            }
+            elements.preview.innerText = JSON.stringify(meme) + ',';
+        }
+
+        function validateInputs() {
+            const inputs = ['english_tags', 'hebrew_tags', 'file_types']
+            for (let key of inputs) {
+                if (key === 'file_types') {
+                    if (elements.file_types.value === 'other' && !elements.custom_file.value.trim()) return alert('Please fill all fields')
+                }
+                if (!elements[key].value.trim()) return alert('Please fill all fields')
+            }
+            return true;
+        }
+
+        function makeId() {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            let id = ''
+            for (let i = 0; i < 5; i++) {
+                id += chars.charAt(getRandomInt(chars.length))
+            }
+            return id
+        }
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max)
+        }
+    </script>
+</body>
+
+</html>
